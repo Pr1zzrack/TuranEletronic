@@ -1,5 +1,7 @@
 from django.urls import path, include
 from .views import *
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
 
 urlpatterns = [
     path('accounts/', include('allauth.urls'), name='accounts'),
@@ -12,3 +14,5 @@ urlpatterns = [
     path('review/', ReviewViewSet.as_view({'get': 'list', 'post': 'create'})),
     path('recommend/', RecommendViewSet.as_view({'get': 'list'}), name='recommend'),
 ]
+
+urlpatterns += staticfiles_urlpatterns()
