@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-a2xwma1qt@3#w3s^0phkc132o#-qwum*#d!5!p^g_b%%f05p=i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['turaneletroniceco.onrender.com']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -76,9 +76,8 @@ WSGI_APPLICATION = 'turanelectro.wsgi.application'
 #     }
 # }
 
-DATABASE_URL = 'postgres://turanelectro_user:OZTVugVO43a0erteUPCaktfrz4Pe5Q4t@dpg-cns5bs0cmk4c73bne7bg-a.oregon-postgres.render.com/turanelectro'
 DATABASES = {
-    'default': dj_database_url.parse(DATABASE_URL)
+    'default': dj_database_url.parse(os.environ.get('DATABASE_URL')),
 }
 
 # Password validation
