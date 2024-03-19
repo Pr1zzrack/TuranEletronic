@@ -24,6 +24,7 @@ from drf_spectacular.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls'), name='accounts'),
     path('', include('turanelecapp.urls'))
 ]
 
