@@ -14,17 +14,13 @@ from rest_framework import generics
 from .models import Contact
 from .serializers import OrderSerializer
 
-class OrderCreateRetrieveView(generics.RetrieveUpdateAPIView):
+class OrderViewSet(viewsets.ModelViewSet):
     queryset = Contact.objects.all()
     serializer_class = OrderSerializer
 
     def perform_create(self, serializer):
         instance = serializer.save()
         send_telegram_message(instance)
-
-class OrderListView(generics.ListAPIView):
-    queryset = Contact.objects.all()
-    serializer_class = OrderSerializer
 
 def send_telegram_message(contact_instance):
     bot_token = '6766161141:AAFVJQK2pNXYuGi9yVeRAkm61FdGZsUgPzA'
