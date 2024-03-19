@@ -11,10 +11,10 @@ from django.utils import timezone
 
 
 from rest_framework import generics
+from .models import Contact
 from .serializers import OrderSerializer
-import requests
 
-class OrderCreateView(generics.CreateAPIView):
+class OrderCreateRetrieveView(generics.RetrieveUpdateAPIView):
     queryset = Contact.objects.all()
     serializer_class = OrderSerializer
 
