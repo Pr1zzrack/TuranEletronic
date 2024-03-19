@@ -14,7 +14,7 @@ from rest_framework import generics
 from .models import Contact
 from .serializers import OrderSerializer
 
-class OrderCreateView(generics.RetrieveUpdateAPIView):
+class OrderCreateRetrieveView(generics.RetrieveUpdateAPIView):
     queryset = Contact.objects.all()
     serializer_class = OrderSerializer
 
