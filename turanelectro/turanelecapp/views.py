@@ -8,8 +8,7 @@ from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet, NumberFilter, ModelMultipleChoiceFilter
 from django.http import QueryDict
 from django.utils import timezone
-
-
+import requests
 from rest_framework import generics
 from .models import Contact
 from .serializers import OrderSerializer
