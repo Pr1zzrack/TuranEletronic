@@ -13,6 +13,7 @@ urlpatterns = [
     path('review/', ReviewViewSet.as_view({'get': 'list', 'post': 'create'})),
     path('recommend/', RecommendViewSet.as_view({'get': 'list'}), name='recommend'),
     path('orders/', OrderCreateRetrieveView.as_view(), name='order-list-create'),
+    path('orders/<int:pk>/', OrderListView.as_view(), name='order-list'),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
