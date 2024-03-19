@@ -3,6 +3,14 @@ from .models import *
 from django.db.models import Avg
 
 
+class OrderSerializer(serializers.Serializer):
+    product_id = serializers.IntegerField()
+    first_name = serializers.CharField(max_length=100)
+    last_name = serializers.CharField(max_length=100)
+    email = serializers.EmailField(max_length=100)
+    phone_number = serializers.IntegerField()
+
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Categories
