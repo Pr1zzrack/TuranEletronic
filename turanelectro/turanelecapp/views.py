@@ -22,6 +22,10 @@ class OrderCreateView(generics.CreateAPIView):
         instance = serializer.save()
         send_telegram_message(instance)
 
+class OrderListView(generics.ListAPIView):
+    queryset = Contact.objects.all()
+    serializer_class = OrderSerializer
+
 def send_telegram_message(contact_instance):
     bot_token = '6766161141:AAFVJQK2pNXYuGi9yVeRAkm61FdGZsUgPzA'
     user_id = '2084770237'
