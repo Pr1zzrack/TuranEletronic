@@ -12,7 +12,7 @@ urlpatterns = [
     path('favorite/', FavoriteViewSet.as_view({'get': 'list', 'post': 'create'}), name='favorite'),
     path('review/', ReviewViewSet.as_view({'get': 'list', 'post': 'create'})),
     path('recommend/', RecommendViewSet.as_view({'get': 'list'}), name='recommend'),
-    path('order/', OrderCreateView.as_view({'get': 'list', 'post': 'create'}), name='contact-create'),
+    path('order/', OrderCreateView.as_view(), name='contact-create'),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
