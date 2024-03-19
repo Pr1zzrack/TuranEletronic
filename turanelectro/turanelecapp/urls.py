@@ -4,7 +4,6 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 
 urlpatterns = [
-    path('accounts/', include('allauth.urls'), name='accounts'),
     path('categories/', CategoryViewSet.as_view({'get': 'list'}), name='categories'),
     path('brands/', BrandViewSet.as_view({'get': 'list'}), name='brands'),
     path('products/', ProductViewSet.as_view({'get': 'list'}), name='product_list'),
