@@ -35,6 +35,14 @@ class MemorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ProductCharacteristicSerializer(serializers.Serializer):
+    characteristics = serializers.ListField(child=serializers.CharField())
+
+    def to_representation(self, instance):
+        return {
+            'characteristics': instance
+        }
+
 class ProductSerializer(serializers.ModelSerializer):
     category = serializers.StringRelatedField()
     brand = serializers.StringRelatedField()
@@ -42,9 +50,8 @@ class ProductSerializer(serializers.ModelSerializer):
     colors = serializers.StringRelatedField(source='color', many=True)
     memories = serializers.StringRelatedField(source='memory', many=True)
     photos = serializers.StringRelatedField(source='photo', many=True)
-    characteristics = serializers.StringRelatedField(source='characteristic', many=True)
-
     rating = serializers.SerializerMethodField()
+    characteristics = serializers.SerializerMethodField()
 
     class Meta:
         model = Products
@@ -53,10 +60,14 @@ class ProductSerializer(serializers.ModelSerializer):
                   'create_date', 'colors', 'memories',
                   'photos', 'characteristics', 'rating']
 
+    def get_characteristics(self, obj):
+        characteristics = obj.characteristic.all()
+        serializer = ProductCharacteristicSerializer(characteristics, many=True)
+        return serializer.data
+
     def get_rating(self, obj):
         rating = obj.reviews.aggregate(Avg('grade'))['grade__avg']
         return rating
-
 
 class BasketSerializer(serializers.ModelSerializer):
     class Meta:
