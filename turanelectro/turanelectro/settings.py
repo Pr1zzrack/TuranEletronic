@@ -15,6 +15,7 @@ SECRET_KEY = 'django-insecure-a2xwma1qt@3#w3s^0phkc132o#-qwum*#d!5!p^g_b%%f05p=i
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+CORS_ORIGIN_ALLOW_ALL = True
 
 
 # Application definition
@@ -33,6 +34,7 @@ INSTALLED_APPS = [
     'allauth.account',
     # 'allauth.socialaccount',
      'drf_spectacular',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -44,6 +46,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'corsheaders.middleware.CorsMiddleware
 ]
 
 ROOT_URLCONF = 'turanelectro.urls'
