@@ -69,6 +69,9 @@ class ProductFilter(FilterSet):
             self.filters['model'].queryset = ProductModel.objects.filter(id=brand_id)
 
 
+from rest_framework.response import Response
+from rest_framework.decorators import action
+
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Products.objects.all()
     serializer_class = ProductSerializer
@@ -78,15 +81,15 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-
         queryset = self.filter_queryset(queryset)
-
-        self.request.query_params._mutable = True
-        self.request.query_params.pop('color', None)
-        self.request.query_params.pop('memory', None)
-        self.request.query_params._mutable = False
-
         return queryset
+
+    @action(detail=True, methods=['get'])
+    def characteristics(self, request, pk=None):
+        product = self.get_object()
+        characteristics = product.productcharacteristic_set.all()
+        serializer = ProductCharacteristicSerializer(characteristics, many=True)
+        return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -98,7 +101,6 @@ class ProductViewSet(viewsets.ModelViewSet):
             'reviews': reviews,
         }
         return Response(response_data)
-
 
 class BasketViewSet(viewsets.ModelViewSet):
     queryset = Baskets.objects.all()
