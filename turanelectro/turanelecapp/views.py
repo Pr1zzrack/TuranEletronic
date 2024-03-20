@@ -12,6 +12,53 @@ import requests
 from rest_framework import generics
 from .models import Contact
 from .serializers import OrderSerializer
+from django.contrib.auth import logout
+from rest_framework import status
+from rest_framework.decorators import action
+from allauth.account.forms import ResetPasswordForm
+from allauth.account.forms import SignupForm, LoginForm
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class LoginViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.AllowAny]
+    @action(detail=False, methods=['post'])
+    def login(self, request):
+        form = LoginForm(request.data)
+        if form.is_valid():
+            user = form.user
+            if user:
+                return Response({"message": "Вход выполнен успешно", "email": user.email}, status=status.HTTP_200_OK)
+        return Response({"error": "Неверные учетные данные"}, status=status.HTTP_400_BAD_REQUEST)
+
+class SignupViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.AllowAny]
+    @action(detail=False, methods=['post'])
+    def signup(self, request):
+        form = SignupForm(request.data)
+        if form.is_valid():
+            user = form.save(request)
+            return Response({"message": "Регистрация прошла успешно", "email": user.email}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LogoutViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.AllowAny]
+    @action(detail=False, methods=['post'])
+    def logout(self, request):
+        logout(request)
+        return Response({"message": "Вы успешно вышли из системы"}, status=status.HTTP_200_OK)
+
+class ForgotPasswordViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.AllowAny]
+    @action(detail=False, methods=['post'])
+    def forgot_password(self, request):
+        form = ResetPasswordForm(request.data)
+        if form.is_valid():
+            return Response({"message": "Ссылка для восстановления пароля отправлена на ваш email"}, status=status.HTTP_200_OK)
+        else:
+            return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Contact.objects.all()
