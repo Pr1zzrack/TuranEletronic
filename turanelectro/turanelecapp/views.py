@@ -17,52 +17,35 @@ from allauth.account.forms import ResetPasswordForm
 from allauth.account.forms import SignupForm, LoginForm
 from django.contrib.auth import get_user_model
 
-User = get_user_model()
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework import permissions
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from allauth.account.views import LoginView, LogoutView, PasswordResetView, SignupView
 
-class LoginViewSet(viewsets.ViewSet):
+class AuthViewSet(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
 
     @action(detail=False, methods=['post'])
     def login(self, request):
-        form = LoginForm(request.data)
-        if form.is_valid():
-            user = form.user
-            if user:
-                return Response({"message": "Вход выполнен успешно", "email": user.email}, status=status.HTTP_200_OK)
-        return Response({"error": "Неверные учетные данные"}, status=status.HTTP_400_BAD_REQUEST)
-
-class SignupViewSet(viewsets.ViewSet):
-    serializer_class = SignupSerializer
-    permission_classes = [permissions.AllowAny]
-
-    @action(detail=False, methods=['post'])
-    def signup(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save(request)
-            return Response({"message": "Регистрация прошла успешно", "email": user.email}, status=status.HTTP_201_CREATED)
-        else:
-            return Response({"error": "Неверные данные", "fields": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
-class LogoutViewSet(viewsets.ViewSet):
-    permission_classes = [permissions.AllowAny]
+        login_view = LoginView.as_view()
+        return login_view(request)
 
     @action(detail=False, methods=['post'])
     def logout(self, request):
-        logout(request)
-        return Response({"message": "Вы успешно вышли из системы"}, status=status.HTTP_200_OK)
-
-class ForgotPasswordViewSet(viewsets.ViewSet):
-    serializer_class = ForgotPasswordSerializer
-    permission_classes = [permissions.AllowAny]
+        logout_view = LogoutView.as_view()
+        return logout_view(request)
 
     @action(detail=False, methods=['post'])
     def forgot_password(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            return Response({"message": "Ссылка для восстановления пароля отправлена на ваш email"}, status=status.HTTP_200_OK)
-        else:
-            return Response({"error": "Неверные данные", "fields": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        password_reset_view = PasswordResetView.as_view()
+        return password_reset_view(request)
+
+    @action(detail=False, methods=['post'])
+    def signup(self, request):
+        signup_view = SignupView.as_view()
+        return signup_view(request)
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Contact.objects.all()
