@@ -3,6 +3,13 @@ from .models import *
 from django.db.models import Avg
 
 
+class SignupSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
 class OrderSerializer(serializers.Serializer):
     product_id = serializers.IntegerField()
     first_name = serializers.CharField(max_length=100)
