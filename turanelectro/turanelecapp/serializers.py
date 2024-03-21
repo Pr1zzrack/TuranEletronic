@@ -124,4 +124,4 @@ from .models import Contact
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
-        fields = ['id', 'first_name', 'last_name', 'phone_number', 'email', 'ordered_product_id']
+        fields = ['id', 'full_name', 'phone_number', 'email', 'ordered_product_id']
