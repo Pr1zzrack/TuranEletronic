@@ -66,16 +66,14 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         instance = serializer.save()
-        send_telegram_message(instance)
+        send_telegram_message(instance, chat_id='-1002030525141')
 
-def send_telegram_message(contact_instance):
+def send_telegram_message(contact_instance, chat_id):
     bot_token = '6766161141:AAFVJQK2pNXYuGi9yVeRAkm61FdGZsUgPzA'
-    user_id = '2084770237'
     message = f"Заказ:\nИмя: {contact_instance.first_name}\nФамилия: {contact_instance.last_name}\nНомер: {contact_instance.phone_number}\nEmail: {contact_instance.email}\nID Продукта: {contact_instance.ordered_product_id}"
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-    payload = {'chat_id': user_id, 'text': message}
+    payload = {'chat_id': chat_id, 'text': message}
     requests.post(url, data=payload)
-
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Categories.objects.all()
