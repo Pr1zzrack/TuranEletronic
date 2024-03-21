@@ -10,8 +10,6 @@ from django.http import QueryDict
 from django.utils import timezone
 import requests
 from rest_framework import generics
-from .models import Contact
-from .serializers import OrderSerializer
 from django.contrib.auth import logout
 from rest_framework import status
 from rest_framework.decorators import action
