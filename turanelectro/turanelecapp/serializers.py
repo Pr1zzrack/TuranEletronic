@@ -12,8 +12,7 @@ class ForgotPasswordSerializer(serializers.Serializer):
 
 class OrderSerializer(serializers.Serializer):
     product_id = serializers.IntegerField()
-    first_name = serializers.CharField(max_length=100)
-    last_name = serializers.CharField(max_length=100)
+    full_name = serializers.CharField(max_length=100)
     email = serializers.EmailField(max_length=100)
     phone_number = serializers.IntegerField()
 
