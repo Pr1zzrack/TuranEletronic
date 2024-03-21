@@ -23,6 +23,7 @@ User = get_user_model()
 
 class LoginViewSet(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
+
     @action(detail=False, methods=['post'])
     def login(self, request):
         form = LoginForm(request.data)
@@ -33,32 +34,37 @@ class LoginViewSet(viewsets.ViewSet):
         return Response({"error": "Неверные учетные данные"}, status=status.HTTP_400_BAD_REQUEST)
 
 class SignupViewSet(viewsets.ViewSet):
+    serializer_class = SignupSerializer
     permission_classes = [permissions.AllowAny]
+
     @action(detail=False, methods=['post'])
     def signup(self, request):
-        form = SignupForm(request.data)
-        if form.is_valid():
-            user = form.save(request)
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save(request)
             return Response({"message": "Регистрация прошла успешно", "email": user.email}, status=status.HTTP_201_CREATED)
         else:
-            return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Неверные данные", "fields": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 class LogoutViewSet(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
+
     @action(detail=False, methods=['post'])
     def logout(self, request):
         logout(request)
         return Response({"message": "Вы успешно вышли из системы"}, status=status.HTTP_200_OK)
 
 class ForgotPasswordViewSet(viewsets.ViewSet):
+    serializer_class = ForgotPasswordSerializer
     permission_classes = [permissions.AllowAny]
+
     @action(detail=False, methods=['post'])
     def forgot_password(self, request):
-        form = ResetPasswordForm(request.data)
-        if form.is_valid():
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
             return Response({"message": "Ссылка для восстановления пароля отправлена на ваш email"}, status=status.HTTP_200_OK)
         else:
-            return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Неверные данные", "fields": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Contact.objects.all()
