@@ -9,7 +9,7 @@ class Contact(models.Model):
     ordered_product_id = models.IntegerField()
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.full_name}"
 
 
 class Categories(models.Model):
