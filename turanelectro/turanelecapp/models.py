@@ -26,6 +26,7 @@ class Categories(models.Model):
 class Brands(models.Model):
     name = models.CharField(max_length=16, verbose_name='Бренд')
     brand_logo = models.ImageField(upload_to='brands_logo', verbose_name='логотип бренда')
+    image = models.ImageField(upload_to='image', verbose_name='фото')
 
     def __str__(self):
         return self.name
