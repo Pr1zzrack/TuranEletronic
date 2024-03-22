@@ -90,6 +90,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Categories.objects.all()
     serializer_class = CategorySerializer
 
+class CarouselViewSet(viewsets.ModelViewSet):
+    queryset = Carousel.objects.all()
+    serializer_class = CarouselSerializer
 
 class BrandViewSet(viewsets.ModelViewSet):
     queryset = Brands.objects.all()
