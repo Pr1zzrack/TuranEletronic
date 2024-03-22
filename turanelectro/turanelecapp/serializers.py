@@ -1,11 +1,53 @@
 from rest_framework import serializers
 from .models import *
 from django.db.models import Avg
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import check_password
 
+User = get_user_model()
 
 class SignupSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=160)
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['email', 'password']
+
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        return user
+
+def authenticate(email=None, password=None):
+    UserModel = get_user_model()
+    try:
+        user = UserModel.objects.get(email=email)
+        if user.check_password(password):
+            return user
+    except UserModel.DoesNotExist:
+        return None
+    return None
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+
+    def validate(self, data):
+        email = data.get('email')
+        password = data.get('password')
+
+        if email and password:
+            user = authenticate(email=email, password=password)
+            if user:
+                data['user'] = user
+            else:
+                raise serializers.ValidationError("Неверные учетные данные")
+        else:
+            raise serializers.ValidationError("Email и пароль обязательны")
+
+        return data
+
 
 class ForgotPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
