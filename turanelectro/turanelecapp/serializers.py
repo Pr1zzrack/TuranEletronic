@@ -118,9 +118,6 @@ class ProductModelSerializer(serializers.ModelSerializer):
         model = ProductModel
         fileds = '__all__'
 
-from rest_framework import serializers
-from .models import Contact
-
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
