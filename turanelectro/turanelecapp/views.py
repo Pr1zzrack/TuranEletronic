@@ -23,17 +23,19 @@ from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from allauth.account.views import LoginView, LogoutView, PasswordResetView, SignupView
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
 class LoginViewSet(viewsets.ViewSet):
+    serializer_class = LoginSerializer
     permission_classes = [permissions.AllowAny]
 
     @action(detail=False, methods=['post'])
     def login(self, request):
-        form = LoginForm(request.data)
-        if form.is_valid():
-            user = form.user
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data.get('user')
             if user:
                 return Response({"message": "Вход выполнен успешно", "email": user.email}, status=status.HTTP_200_OK)
         return Response({"error": "Неверные учетные данные"}, status=status.HTTP_400_BAD_REQUEST)
@@ -46,7 +48,7 @@ class SignupViewSet(viewsets.ViewSet):
     def signup(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            user = serializer.save(request)
+            user = serializer.save()
             return Response({"message": "Регистрация прошла успешно", "email": user.email}, status=status.HTTP_201_CREATED)
         else:
             return Response({"error": "Неверные данные", "fields": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
