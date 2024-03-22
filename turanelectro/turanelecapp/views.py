@@ -86,10 +86,6 @@ def send_telegram_message(contact_instance, chat_id):
     payload = {'chat_id': chat_id, 'text': message}
     requests.post(url, data=payload)
 
-class ProductModelViewSet(viewsets.ModelViewSet):
-    queryset = ProductModel.objects.all()
-    serializer_class = ProductModelSerializer
-
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Categories.objects.all()
     serializer_class = CategorySerializer
