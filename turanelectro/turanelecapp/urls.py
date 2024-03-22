@@ -17,6 +17,7 @@ urlpatterns = [
     path('review/', ReviewViewSet.as_view({'get': 'list', 'post': 'create'})),
     path('recommend/', RecommendViewSet.as_view({'get': 'list'}), name='recommend'),
     path('orders/', OrderViewSet.as_view({'get': 'list', 'post': 'create'}), name='order-list-create'),
+    path('model/', ProductModelViewSet.as_view({'get': 'list', 'post': 'create'}), name='model'),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
