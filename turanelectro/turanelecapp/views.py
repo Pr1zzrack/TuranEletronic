@@ -175,7 +175,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth.models import User
+from .serializers import BasketSerializer
 
 class BasketViewSet(viewsets.ModelViewSet):
     queryset = Baskets.objects.all()
@@ -186,30 +186,15 @@ class BasketViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        email = request.data.get('email')
-        product_id = request.data.get('product_id')
-        
-        if not email or not product_id:
-            return Response({'error': 'Email and product_id are required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Поиск пользователя по email
-        user = User.objects.filter(email=email).first()
-        if not user:
-            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        # Создание или получение корзины пользователя
-        basket = Baskets.objects.filter(user=user).first()
-        if basket:
-            basket.products.add(product_id)
-            serializer = self.get_serializer(basket)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        
-        data = {'user': user.id, 'products': [product_id]}
-        serializer = self.get_serializer(data=data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 class ProductPhotoViewSet(viewsets.ModelViewSet):
     queryset = ProductPhoto.objects.all()
