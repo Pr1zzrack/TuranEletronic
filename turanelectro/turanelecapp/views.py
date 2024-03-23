@@ -147,6 +147,31 @@ class ProductViewSet(viewsets.ModelViewSet):
         return Response(response_data)
 
 
+# class BasketViewSet(viewsets.ModelViewSet):
+#     queryset = Baskets.objects.all()
+#     serializer_class = BasketSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def perform_create(self, serializer):
+#         serializer.save(user=self.request.user)
+
+#     def create(self, request, *args, **kwargs):
+#         user = request.user
+#         product_id = request.data.get('products')
+        
+#         basket = Baskets.objects.filter(user=user).first()
+#         if basket:
+#             basket.products.add(product_id)
+#             return Response(self.get_serializer(basket).data, status=status.HTTP_200_OK)
+        
+#         data = {'user': user.id, 'products': [product_id]}
+#         serializer = self.get_serializer(data=data)
+#         serializer.is_valid(raise_exception=True)
+#         self.perform_create(serializer)
+#         headers = self.get_success_headers(serializer.data)
+#         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
 class BasketViewSet(viewsets.ModelViewSet):
     queryset = Baskets.objects.all()
     serializer_class = BasketSerializer
@@ -162,14 +187,21 @@ class BasketViewSet(viewsets.ModelViewSet):
         basket = Baskets.objects.filter(user=user).first()
         if basket:
             basket.products.add(product_id)
-            return Response(self.get_serializer(basket).data, status=status.HTTP_200_OK)
+            serializer = self.get_serializer(basket)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         
         data = {'user': user.id, 'products': [product_id]}
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+        # Получаем email пользователя и добавляем его в данные ответа
+        user_email = user.email if user.email else None
+        response_data = serializer.data
+        response_data['user_email'] = user_email
+
+        return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
 
 class ProductPhotoViewSet(viewsets.ModelViewSet):
     queryset = ProductPhoto.objects.all()
