@@ -9,6 +9,7 @@ from django.contrib.auth import logout
 from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework import permissions
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 from django.contrib.auth import get_user_model
 
@@ -148,23 +149,24 @@ class ProductViewSet(viewsets.ModelViewSet):
 
 
 class BasketViewSet(viewsets.ModelViewSet):
-    queryset = Baskets.objects.all()
+    queryset = Basket.objects.all()
     serializer_class = BasketSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user.email if self.request.user else None)
+        serializer.save(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        user_email = request.user.email if request.user.is_authenticated else None
+        user = request.user
         product_id = request.data.get('products')
-
-        basket = Baskets.objects.filter(user_email=user_email).first()
+        
+        basket = Basket.objects.filter(user=user).first()
         if basket:
             basket.products.add(product_id)
             return Response(self.get_serializer(basket).data, status=status.HTTP_200_OK)
-
-        data = {'user_email': user_email, 'products': [product_id]}
+        
+        # Если корзина не найдена, создаем новую
+        data = {'user': user.id, 'products': [product_id]}
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
