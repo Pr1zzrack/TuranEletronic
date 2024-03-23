@@ -80,7 +80,7 @@ class ProductCharacteristic(models.Model):
 
 
 class Baskets(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     products = models.ManyToManyField(Products, verbose_name='Продукты в корзине')
 
     class Meta:
