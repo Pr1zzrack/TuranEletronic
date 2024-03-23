@@ -124,8 +124,8 @@ class BasketSerializer(serializers.ModelSerializer):
         model = Baskets
         fields = ['user_email', 'products']
 
-    # def get_user_email(self, obj):
-    #     return obj.user.email if obj.user else None
+    def get_user_email(self, obj):
+        return obj.user.email if obj.user else None
 
 
 class ProductPhotoSerializer(serializers.ModelSerializer):
