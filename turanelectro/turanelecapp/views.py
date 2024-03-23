@@ -1,15 +1,16 @@
-from datetime import timedelta
-from django.http import QueryDict
-from django.utils import timezone
-import requests
-from rest_framework import generics, status, permissions, viewsets
-from rest_framework.exceptions import ValidationError
+from rest_framework import viewsets, permissions
 from rest_framework.response import Response
+from .models import *
+from .serializers import *
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet, NumberFilter, ModelMultipleChoiceFilter
-from allauth.account.forms import ResetPasswordForm, SignupForm, LoginForm
+import requests
+from django.contrib.auth import logout
+from rest_framework.decorators import action
+from rest_framework import status
+from rest_framework import permissions
+from rest_framework import viewsets
 from django.contrib.auth import get_user_model
-from allauth.account.views import LoginView, LogoutView, PasswordResetView, SignupView
 
 User = get_user_model()
 
@@ -149,7 +150,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 class BasketViewSet(viewsets.ModelViewSet):
     queryset = Baskets.objects.all()
     serializer_class = BasketSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
