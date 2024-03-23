@@ -172,18 +172,32 @@ class ProductViewSet(viewsets.ModelViewSet):
 #         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.models import User
+
 class BasketViewSet(viewsets.ModelViewSet):
     queryset = Baskets.objects.all()
     serializer_class = BasketSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        user = request.user
-        product_id = request.data.get('products')
+        email = request.data.get('email')
+        product_id = request.data.get('product_id')
         
+        if not email or not product_id:
+            return Response({'error': 'Email and product_id are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Поиск пользователя по email
+        user = User.objects.filter(email=email).first()
+        if not user:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Создание или получение корзины пользователя
         basket = Baskets.objects.filter(user=user).first()
         if basket:
             basket.products.add(product_id)
@@ -195,13 +209,7 @@ class BasketViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-
-        # Получаем email пользователя и добавляем его в данные ответа
-        user_email = user.email if user.email else None
-        response_data = serializer.data
-        response_data['user_email'] = user_email
-
-        return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 class ProductPhotoViewSet(viewsets.ModelViewSet):
     queryset = ProductPhoto.objects.all()
