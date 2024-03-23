@@ -179,12 +179,16 @@ class BasketViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         data = serializer.data
         for item in data:
-            user_id = item['user']
-            user = User.objects.filter(id=user_id).first()
-            if user:
-                item['user'] = user.email
+            if 'user' in item:
+                user_id = item['user']
+                user = User.objects.filter(id=user_id).first()
+                if user:
+                    item['user'] = user.email
+                else:
+                    item['user'] = None
+            else:
+                item['user'] = None
         return Response(data)
-
 
 class ProductPhotoViewSet(viewsets.ModelViewSet):
     queryset = ProductPhoto.objects.all()
