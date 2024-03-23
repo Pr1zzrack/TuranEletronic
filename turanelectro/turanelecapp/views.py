@@ -11,12 +11,6 @@ from rest_framework import status
 from rest_framework import permissions
 from rest_framework import viewsets
 from django.contrib.auth import get_user_model
-from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-
-
 
 User = get_user_model()
 
@@ -156,7 +150,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 class BasketViewSet(viewsets.ModelViewSet):
     queryset = Baskets.objects.all()
     serializer_class = BasketSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -170,7 +164,7 @@ class BasketViewSet(viewsets.ModelViewSet):
 
         basket = Baskets.objects.filter(user=user).first()
         if basket:
-            baskets.products.add(product_id)
+            basket.products.add(product_id)
             return Response(self.get_serializer(basket).data, status=status.HTTP_200_OK)
         
         data = {'user': user.id, 'products': [product_id]}
