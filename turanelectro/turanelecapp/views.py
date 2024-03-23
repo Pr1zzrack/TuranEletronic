@@ -164,7 +164,6 @@ class BasketViewSet(viewsets.ModelViewSet):
             basket.products.add(product_id)
             return Response(self.get_serializer(basket).data, status=status.HTTP_200_OK)
         
-        # Если корзина не найдена, создаем новую
         data = {'user': user.id, 'products': [product_id]}
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
