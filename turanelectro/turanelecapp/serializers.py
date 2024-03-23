@@ -6,6 +6,21 @@ from django.contrib.auth.hashers import check_password
 
 User = get_user_model()
 
+# class SignupSerializer(serializers.Serializer):
+#     username = serializers.CharField(max_length=160)
+#     email = serializers.EmailField()
+#     password = serializers.CharField(write_only=True)
+
+#     class Meta:
+#         model = User
+#         fields = ['email', 'password']
+
+#     def create(self, validated_data):
+#         user = User.objects.create_user(**validated_data)
+#         return user
+from rest_framework import serializers
+from django.contrib.auth.models import User
+
 class SignupSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=160)
     email = serializers.EmailField()
@@ -13,7 +28,12 @@ class SignupSerializer(serializers.Serializer):
 
     class Meta:
         model = User
-        fields = ['email', 'password']
+        fields = ['username', 'email', 'password']
+
+    def validate_password(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError("Пароль должен быть не менее 8 символов")
+        return value
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
