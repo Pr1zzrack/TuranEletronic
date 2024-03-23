@@ -118,9 +118,14 @@ class ProductSerializer(serializers.ModelSerializer):
         return rating
 
 class BasketSerializer(serializers.ModelSerializer):
+    user_email = serializers.SerializerMethodField()
+
     class Meta:
-        model = Baskets
-        fields = '__all__'
+        model = Basket
+        fields = ['user_email', 'products']
+
+    def get_user_email(self, obj):
+        return obj.user.email if obj.user else None
 
 
 class ProductPhotoSerializer(serializers.ModelSerializer):
