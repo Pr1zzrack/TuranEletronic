@@ -11,6 +11,12 @@ from rest_framework import status
 from rest_framework import permissions
 from rest_framework import viewsets
 from django.contrib.auth import get_user_model
+from rest_framework import viewsets
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+
+
 
 User = get_user_model()
 
@@ -150,7 +156,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 class BasketViewSet(viewsets.ModelViewSet):
     queryset = Baskets.objects.all()
     serializer_class = BasketSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -159,9 +165,12 @@ class BasketViewSet(viewsets.ModelViewSet):
         user = request.user
         product_id = request.data.get('products')
         
+        if not product_id:
+            return Response({'error': 'Product id is required'}, status=status.HTTP_400_BAD_REQUEST)
+
         basket = Baskets.objects.filter(user=user).first()
         if basket:
-            basket.products.add(product_id)
+            baskets.products.add(product_id)
             return Response(self.get_serializer(basket).data, status=status.HTTP_200_OK)
         
         data = {'user': user.id, 'products': [product_id]}
@@ -170,6 +179,17 @@ class BasketViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        data = serializer.data
+        for item in data:
+            user_id = item['user']
+            user = User.objects.filter(id=user_id).first()
+            if user:
+                item['user'] = user.email
+        return Response(data)
 
 
 class ProductPhotoViewSet(viewsets.ModelViewSet):
