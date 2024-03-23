@@ -121,7 +121,7 @@ class BasketSerializer(serializers.ModelSerializer):
     user_email = serializers.SerializerMethodField()
 
     class Meta:
-        model = Basket
+        model = Baskets
         fields = ['user_email', 'products']
 
     def get_user_email(self, obj):
