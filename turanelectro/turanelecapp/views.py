@@ -1,29 +1,15 @@
 from datetime import timedelta
-from rest_framework import viewsets, permissions
-from rest_framework.exceptions import ValidationError
-from rest_framework.response import Response
-from .models import *
-from .serializers import *
-from rest_framework.filters import SearchFilter
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet, NumberFilter, ModelMultipleChoiceFilter
 from django.http import QueryDict
 from django.utils import timezone
 import requests
-from rest_framework import generics
-from django.contrib.auth import logout
-from rest_framework import status
-from rest_framework.decorators import action
-from allauth.account.forms import ResetPasswordForm
-from allauth.account.forms import SignupForm, LoginForm
-from django.contrib.auth import get_user_model
-
+from rest_framework import generics, status, permissions, viewsets
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import permissions
-from rest_framework import viewsets
-from rest_framework.decorators import action
-from allauth.account.views import LoginView, LogoutView, PasswordResetView, SignupView
+from rest_framework.filters import SearchFilter
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet, NumberFilter, ModelMultipleChoiceFilter
+from allauth.account.forms import ResetPasswordForm, SignupForm, LoginForm
 from django.contrib.auth import get_user_model
+from allauth.account.views import LoginView, LogoutView, PasswordResetView, SignupView
 
 User = get_user_model()
 
@@ -129,10 +115,6 @@ class ProductFilter(FilterSet):
         if brand_id:
             self.filters['model'].queryset = ProductModel.objects.filter(id=brand_id)
 
-
-from rest_framework.response import Response
-from rest_framework.decorators import action
-
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Products.objects.all()
     serializer_class = ProductSerializer
@@ -163,10 +145,30 @@ class ProductViewSet(viewsets.ModelViewSet):
         }
         return Response(response_data)
 
+
 class BasketViewSet(viewsets.ModelViewSet):
     queryset = Baskets.objects.all()
     serializer_class = BasketSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        product_id = request.data.get('products')
+        
+        basket = Baskets.objects.filter(user=user).first()
+        if basket:
+            basket.products.add(product_id)
+            return Response(self.get_serializer(basket).data, status=status.HTTP_200_OK)
+        
+        data = {'user': user.id, 'products': [product_id]}
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class ProductPhotoViewSet(viewsets.ModelViewSet):
