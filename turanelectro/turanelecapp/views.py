@@ -153,42 +153,23 @@ class BasketViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(user=self.request.user.email if self.request.user else None)
 
     def create(self, request, *args, **kwargs):
-        user = request.user
+        user_email = request.user.email if request.user.is_authenticated else None
         product_id = request.data.get('products')
-        
-        if not product_id:
-            return Response({'error': 'Product id is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        basket = Baskets.objects.filter(user=user).first()
+        basket = Baskets.objects.filter(user_email=user_email).first()
         if basket:
             basket.products.add(product_id)
             return Response(self.get_serializer(basket).data, status=status.HTTP_200_OK)
-        
-        data = {'user': user.id, 'products': [product_id]}
+
+        data = {'user_email': user_email, 'products': [product_id]}
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        data = serializer.data
-        for item in data:
-            if 'user' in item:
-                user_id = item['user']
-                user = User.objects.filter(id=user_id).first()
-                if user:
-                    item['user'] = user.email
-                else:
-                    item['user'] = None
-            else:
-                item['user'] = None
-        return Response(data)
 
 class ProductPhotoViewSet(viewsets.ModelViewSet):
     queryset = ProductPhoto.objects.all()
