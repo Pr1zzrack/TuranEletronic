@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     # 'allauth.socialaccount',
-     'drf_spectacular',
+    'drf_spectacular',
     'corsheaders',
 ]
 
