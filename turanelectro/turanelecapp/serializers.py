@@ -137,11 +137,34 @@ class ProductPhotoSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
+    email = serializers.EmailField()
+    name = serializers.SerializerMethodField()
 
     class Meta:
         model = Review
-        fields = '__all__'
+        fields = ['id', 'email', 'name', 'product', 'text', 'grade']
+
+    def get_name(self, obj):
+        if obj.name:
+            return obj.name
+        elif obj.user:
+            return obj.user.username
+        return None
+
+    def create(self, validated_data):
+        email = validated_data.get('email')
+        user = User.objects.filter(email=email).first()
+        if user:
+            validated_data['user'] = user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        email = validated_data.get('email')
+        if email:
+            user = User.objects.filter(email=email).first()
+            if user:
+                validated_data['user'] = user
+        return super().update(instance, validated_data)
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
