@@ -25,8 +25,8 @@ class Categories(models.Model):
 
 class Brands(models.Model):
     name = models.CharField(max_length=16, verbose_name='Бренд')
-    brand_logo = models.ImageField(upload_to='brands_logo', verbose_name='логотип бренда')
-    image = models.ImageField(upload_to='image', verbose_name='фото')
+    brand_logo = models.FileField(upload_to='media/brands_logo/', verbose_name='логотип бренда')
+    image = models.FileField(upload_to='media/image/', verbose_name='фото')
 
     def __str__(self):
         return self.name
@@ -90,7 +90,7 @@ class Baskets(models.Model):
 
 class ProductPhoto(models.Model):
     product = models.ForeignKey(Products, on_delete=models.CASCADE, verbose_name='Товар', related_name='photo')
-    image = models.ImageField(upload_to='product_photo/', verbose_name='Фото')
+    image = models.FileField(upload_to='media/product_photo/', verbose_name='Фото')
 
     class Meta:
         verbose_name = 'Фотография товара'
@@ -135,7 +135,7 @@ class Favorite(models.Model):
 
 class Carousel(models.Model):
     text = models.CharField(max_length=128, verbose_name='Текст')
-    image = models.ImageField(upload_to='carousel_photo/', verbose_name='Изображение')
+    image = models.FileField(upload_to='media/carousel_photo/', verbose_name='Изображение')
 
     class Meta:
         verbose_name = 'Карусель'
