@@ -175,10 +175,12 @@ class ProductPhotoViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
+        email = serializer.validated_data.get('email')
+        user = User.objects.filter(email=email).first()
+        serializer.save(user=user)
 
 class FavoriteViewSet(viewsets.ModelViewSet):
     queryset = Favorite.objects.all()
