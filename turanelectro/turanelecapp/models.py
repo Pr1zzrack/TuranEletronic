@@ -102,9 +102,11 @@ class ProductPhoto(models.Model):
 
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    email = models.EmailField(verbose_name='Email')
     product = models.ForeignKey(Products, on_delete=models.CASCADE, verbose_name='Товар', related_name='reviews')
     text = models.TextField(verbose_name='Текст отзыва')
     grade = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 6)], verbose_name='Оценка')
+    name = models.CharField(max_length=255, verbose_name='Имя', blank=True)
 
     class Meta:
         verbose_name = 'Отзыв'
@@ -112,7 +114,14 @@ class Review(models.Model):
         ordering = ['user']
 
     def __str__(self):
-        return f'Отзыв - {self.user.username}'
+        return f'Отзыв - {self.name}'
+
+    def save(self, *args, **kwargs):
+        if not self.name:
+            user = User.objects.filter(email=self.email).first()
+            if user:
+                self.name = user.username
+        super().save(*args, **kwargs)
 
 
 class Favorite(models.Model):
