@@ -16,6 +16,18 @@ class SignupSerializer(serializers.Serializer):
         model = User
         fields = ['username', 'email', 'password']
 
+    def validate(self, data):
+        email = data.get('email')
+        username = data.get('username')
+
+        if User.objects.filter(email=email).exists():
+            raise serializers.ValidationError("Пользователь с таким email уже существует.")
+
+        if User.objects.filter(username=username).exists():
+            raise serializers.ValidationError("Пользователь с таким именем уже существует.")
+
+        return data
+
     def validate_password(self, value):
         if len(value) < 8:
             raise serializers.ValidationError("Пароль должен быть не менее 8 символов")
