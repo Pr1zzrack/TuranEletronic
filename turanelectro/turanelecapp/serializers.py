@@ -135,6 +135,7 @@ class ProductSerializer(serializers.ModelSerializer):
         rating = obj.reviews.aggregate(Avg('grade'))['grade__avg']
         return rating
 
+
 class BasketSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
 
