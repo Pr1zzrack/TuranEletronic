@@ -148,32 +148,37 @@ class ProductViewSet(viewsets.ModelViewSet):
         return Response(response_data)
 
 
-
 class BasketViewSet(viewsets.ModelViewSet):
     queryset = Baskets.objects.all()
     serializer_class = BasketSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        user_id = self.request.user.id
-        # Проверяем, существует ли корзина для данного пользователя
-        basket = Baskets.objects.filter(user_id=user_id).first()
-        if basket:
-            # Если существует, обновляем корзину, а не создаем новую
-            serializer.save(instance=basket)
-        else:
-            serializer.save(user=self.request.user)
+        serializer.save(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        user = request.user
+        product_id = request.data.get('products')
+        
+        basket = Baskets.objects.filter(user=user).first()
+        if basket:
+            basket.products.add(product_id)
+            serializer = self.get_serializer(basket)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        data = {'user': user.id, 'products': [product_id]}
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        headers = self.get_success_headers(serializer.data)
+        
+        # Получаем email пользователя и добавляем его в данные ответа
+        user_email = user.email if user.email else None
+        response_data = serializer.data
+        response_data['user_email'] = user_email
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 class ProductPhotoViewSet(viewsets.ModelViewSet):
     queryset = ProductPhoto.objects.all()
