@@ -153,7 +153,7 @@ class BasketViewSet(viewsets.ModelViewSet):
     serializer_class = BasketSerializer
 
     def create(self, request, *args, **kwargs):
-        product_ids = request.data.get('products')
+        product_ids = request.data.getlist('products')
         email = request.data.get('email')
 
         if not product_ids:
@@ -162,12 +162,12 @@ class BasketViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Необходимо указать email пользователя'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            user = User.objects.get(email=email)
+            user, _ = User.objects.get_or_create(email=email)
         except User.DoesNotExist:
             return Response({'error': 'Пользователь с указанным email не найден'}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            basket = Baskets.objects.get(user=user)
+            basket, _ = Baskets.objects.get_or_create(user=user)
         except Baskets.DoesNotExist:
             basket = Baskets.objects.create(user=user)
 
