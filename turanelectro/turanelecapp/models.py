@@ -80,7 +80,6 @@ class ProductCharacteristic(models.Model):
 
 
 class Baskets(models.Model):
-    email = models.EmailField()
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     products = models.ManyToManyField(Products, verbose_name='Продукты в корзине')
 
