@@ -137,11 +137,21 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class BasketSerializer(serializers.ModelSerializer):
-    user_email = serializers.SerializerMethodField()
-
+    email = serializers.EmailField(write_only=True)
+    user_email = serializers.EmailField(source='user.email', read_only=True)
+    
     class Meta:
         model = Baskets
-        fields = ['user', 'user_email', 'products']
+        fields = ['email', 'user_email', 'products']
+
+    def create(self, validated_data):
+        email = validated_data.pop('email')
+        user = User.objects.filter(email=email).first()
+        if not user:
+            raise serializers.ValidationError("Пользователь с указанным email не найден")
+
+        basket = Baskets.objects.create(user=user)
+        return basket
 
 class ProductPhotoSerializer(serializers.ModelSerializer):
     class Meta:
