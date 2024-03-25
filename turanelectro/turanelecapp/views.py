@@ -228,18 +228,13 @@ class LoginViewSet(viewsets.ViewSet):
         return Response({"error": "Неверные учетные данные"}, status=status.HTTP_400_BAD_REQUEST)
 
 class SignupViewSet(viewsets.ViewSet):
-    serializer_class = SignupSerializer
-    permission_classes = [permissions.AllowAny]
-
-    @action(detail=False, methods=['post'])
-    def signup(self, request):
-        serializer = self.serializer_class(data=request.data)
+    def create(self, request):
+        serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            login(request, user)
-            return Response({"message": "Регистрация прошла успешно", "email": user.email}, status=status.HTTP_201_CREATED)
-        else:
-            return Response({"error": "Неверные данные", "fields": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            return Response({'message': 'Пользователь успешно зарегистрирован'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LogoutViewSet(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
