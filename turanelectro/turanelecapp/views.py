@@ -155,7 +155,14 @@ class BasketViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        user_id = self.request.user.id
+        # Проверяем, существует ли корзина для данного пользователя
+        basket = Baskets.objects.filter(user_id=user_id).first()
+        if basket:
+            # Если существует, обновляем корзину, а не создаем новую
+            serializer.save(instance=basket)
+        else:
+            serializer.save(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
