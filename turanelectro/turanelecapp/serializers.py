@@ -242,6 +242,9 @@ class SignupSerializer(serializers.Serializer):
         user = User.objects.create_user(**validated_data)
         return user
 
+from django.contrib.auth import authenticate
+from rest_framework import serializers
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
@@ -255,12 +258,11 @@ class LoginSerializer(serializers.Serializer):
             if user:
                 data['user'] = user
             else:
-                raise serializers.ValidationError("Неверные учетные данные")
+                raise serializers.ValidationError('Неверные учетные данные.')
         else:
-            raise serializers.ValidationError("Email и пароль обязательны")
+            raise serializers.ValidationError('Email и пароль обязательны для входа.')
 
         return data
-
 class ForgotPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
