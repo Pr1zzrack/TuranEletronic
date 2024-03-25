@@ -137,11 +137,11 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class BasketSerializer(serializers.ModelSerializer):
-    # email = serializers.EmailField()
+    user_email = serializers.SerializerMethodField()
 
     class Meta:
         model = Baskets
-        fields = ['products']
+        fields = ['user', 'user_email', 'products']
 
 class ProductPhotoSerializer(serializers.ModelSerializer):
     class Meta:
