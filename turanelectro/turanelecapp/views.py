@@ -113,7 +113,11 @@ class ProductFilter(FilterSet):
         super().__init__(*args, **kwargs)
         brand_id = self.data.get('brand')
         if brand_id:
-            self.filters['model'].queryset = ProductModel.objects.filter(brand_id=brand_id)
+            try:
+                brand = Brand.objects.get(pk=brand_id)
+                self.filters['model'].queryset = ProductModel.objects.filter(brand=brand)
+            except Brand.DoesNotExist:
+                pass
 
 
 
