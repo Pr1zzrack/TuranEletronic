@@ -113,8 +113,8 @@ class ProductFilter(FilterSet):
         super().__init__(*args, **kwargs)
         brand_id = self.data.get('brand')
         if brand_id:
-            # Фильтруем модели по выбранному бренду
             self.filters['model'].queryset = ProductModel.objects.filter(brand_id=brand_id)
+
 
 
 class ProductViewSet(viewsets.ModelViewSet):
