@@ -153,7 +153,7 @@ class BasketViewSet(viewsets.ModelViewSet):
     serializer_class = BasketSerializer
 
     def create(self, request, *args, **kwargs):
-        product_ids = request.data.getlist('products')
+        product_ids = request.data.get('products', [])
         email = request.data.get('email')
 
         if not product_ids:
