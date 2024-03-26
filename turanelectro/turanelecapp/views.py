@@ -116,7 +116,7 @@ class ProductFilter(FilterSet):
             try:
                 brand = Brands.objects.get(pk=brand_id)
                 self.filters['model'].queryset = ProductModel.objects.filter(brand=brand)
-            except Brand.DoesNotExist:
+            except Brands.DoesNotExist:
                 pass
 
 
