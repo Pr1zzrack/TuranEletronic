@@ -102,8 +102,10 @@ class MemoryViewSet(viewsets.ModelViewSet):
 class ProductFilter(FilterSet):
     min_price = NumberFilter(field_name="price", lookup_expr='gte', label='От')
     max_price = NumberFilter(field_name="price", lookup_expr='lte', label='До')
-    color = ModelMultipleChoiceFilter(field_name='color__name', to_field_name='name', queryset=Colors.objects.all(), label='Цвет')
-    memory = ModelMultipleChoiceFilter(field_name='memory__value', to_field_name='value', queryset=Memories.objects.all(), label='Память')
+    color = ModelMultipleChoiceFilter(field_name='color__name', to_field_name='name', queryset=Colors.objects.all(),
+                              label='Цвет')
+    memory = ModelMultipleChoiceFilter(field_name='memory__value', to_field_name='value', queryset=Memories.objects.all(),
+                               label='Память')
 
     class Meta:
         model = Products
@@ -113,12 +115,7 @@ class ProductFilter(FilterSet):
         super().__init__(*args, **kwargs)
         brand_id = self.data.get('brand')
         if brand_id:
-            try:
-                brand = Brands.objects.get(pk=brand_id)
-                self.filters['model'].queryset = ProductModel.objects.filter(brand=brand)
-            except Brands.DoesNotExist:
-                pass
-
+            self.filters['model'].queryset = ProductModel.objects.filter(id=brand_id)
 
 
 class ProductViewSet(viewsets.ModelViewSet):
